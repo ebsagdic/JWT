@@ -1,7 +1,10 @@
 ﻿using System;
-namespace JWT.Model
+using System.Collections.Generic;
+
+namespace JWT.UI.Models
 {
-    public class CustomerDto
+
+    public class CustomerModel
     {
         public int Id { get; set; }
         public string FirstName { get; set; }
@@ -9,6 +12,12 @@ namespace JWT.Model
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string City { get; set; }
-        public string? LastUpdateUser { get; set; }
     }
+
+    public class CustomerListModel
+    {
+        public List<CustomerModel> Customers { get; set; } = new List<CustomerModel>();
+    }
+    
+    
 }

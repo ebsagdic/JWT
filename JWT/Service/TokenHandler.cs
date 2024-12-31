@@ -29,7 +29,6 @@ namespace JWT.Service
 
             //Oluşturulacak token ayarlarını veriyoruz.
             tokenInstance.Expiration = DateTime.Now.AddMinutes(5);
-
             JwtSecurityToken securityToken = new JwtSecurityToken(
                 issuer: _tokenOption.Issuer,//Oluşturulacak token değerini kimin dağıttığını ifade edeceğimiz alandır
                 audience: string.Join(",", _tokenOption.Audience),//Oluşturulacak token değerini kimlerin/hangi originlerin/sitelerin kullanacağını belirlediğimiz alandır.

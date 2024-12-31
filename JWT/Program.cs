@@ -2,10 +2,13 @@ using Business;
 using Business.Abstracts;
 using Business.Services;
 using Data.Concretes;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 using JWT.Core.Abstracts;
 using JWT.Core.Model;
 using JWT.Repository.Context;
 using JWT.Repository.UnitOfWork;
+using JWT.Service.Validations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +29,10 @@ builder.Services.AddSwaggerGen(c =>
         Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey
+        //Type = SecuritySchemeType.ApiKey// Aþaðýdaki 3 deðer, swagger üzerinden istek atýlýrken Bearer headerýna ihtiyaç kalmamasý için eklendi.
+        Type = SecuritySchemeType.Http,  // Burada deðiþiklik yapýldý
+        BearerFormat = "JWT",
+        Scheme = "bearer"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -45,10 +51,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<ProductDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CustomerDtoValidator>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -95,6 +104,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = tokenOptions.Issuer,
         ValidAudience = tokenOptions.Audience.FirstOrDefault(),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey)),
+
         ValidateIssuerSigningKey = true,
         ValidateAudience = true,
         ValidateIssuer = true,
