@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Diagnostics.Metrics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -53,15 +55,7 @@ namespace JWT.UI.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult Login(string ReturnUrl = null)
-        {
-
-            return View(new LoginModel()
-            {
-                ReturnUrl = ReturnUrl
-            });
-        }
+        
 
         public IActionResult Forbidden()
         {
@@ -72,6 +66,16 @@ namespace JWT.UI.Controllers
         {
             HttpContext.SignOutAsync();
             return Redirect("~/");
+        }
+
+        [HttpGet]
+        public IActionResult Login(string ReturnUrl = null)
+        {
+
+            return View(new LoginModel()
+            {
+                ReturnUrl = ReturnUrl
+            });
         }
 
         [HttpPost]
@@ -85,9 +89,13 @@ namespace JWT.UI.Controllers
             string jsonString = JsonSerializer.Serialize(loginModel);
             var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var result = await _httpClient.PostAsync("/api/Auth/LoginAsync", content);
+            var result = await _httpClient.PostAsync("/api/Auth/Login", content);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true // Büyük/küçük harf farkını görmezden gelir
+            };
 
-            var responseModel = JsonSerializer.Deserialize<ResponseMainModel<ResponseTokenModel>>(await result.Content.ReadAsStringAsync());
+            var responseModel = JsonSerializer.Deserialize<ResponseMainModel<ResponseTokenModel>>(await result.Content.ReadAsStringAsync(),options);
             if (result.IsSuccessStatusCode)
             {
                 var handler = new JwtSecurityTokenHandler();
@@ -139,6 +147,71 @@ namespace JWT.UI.Controllers
             }
             ModelState.AddModelError("", "Girilen kullanıcı adı veya parola yanlış");
             return View(loginModel);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Register()
+        {
+            RegisterModel model = new RegisterModel();
+            model.RoleSelectList = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+
+            string jsonString = JsonSerializer.Serialize(model);
+            var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var result = await _httpClient.GetAsync("/api/User/roles");
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var responseMainModel = JsonSerializer.Deserialize<ResponseMainModel<List<string>>>(await result.Content.ReadAsStringAsync(),options);
+
+            if (responseMainModel.IsSuccessful)
+            {
+                foreach (var item in responseMainModel.Data)
+                {
+                    //ASP.NET MVC'de bir SelectListItem nesnesi, bir HTML <select> (dropdown) öğesinin içindeki <option> etiketlerini temsil eder.
+                    // TextDropdown listesinde kullanıcıya görünen metni temsil eder.
+                    //Dropdown'dan seçim yapıldığında, form gönderilirken arka uca iletilen değeri temsil eder.
+                    model.RoleSelectList.Add(new SelectListItem { Text = item, Value = item });
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterModel registerModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(registerModel);
+            }
+
+            string jsonString = JsonSerializer.Serialize(registerModel);
+            var content = new StringContent(jsonString,Encoding.UTF8, "application/json");
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var result = await _httpClient.PostAsync("/api/User/Register", content);
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var responseModel = JsonSerializer.Deserialize<ResponseMainModel<RegisterModel>>(await result.Content.ReadAsStringAsync(),options);
+
+            if (result.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            else
+            {
+                foreach (var error in responseModel.Errors)
+                {
+                    ModelState.AddModelError("other", error);
+                    return View(registerModel);
+                }
+            }
+            return View(registerModel);
         }
 
 

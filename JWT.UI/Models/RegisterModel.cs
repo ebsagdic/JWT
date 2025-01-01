@@ -33,7 +33,7 @@ namespace JWT.UI.Models
 
         [Required]
         public string SelectedRole { get; set; }
-        public List<SelectListItem> RoleSelectList { get; set; }
+        public List<SelectListItem>? RoleSelectList { get; set; }
         
     }
 }
