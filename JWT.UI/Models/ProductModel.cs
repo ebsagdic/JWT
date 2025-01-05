@@ -13,6 +13,8 @@ namespace JWT.UI.Models
         //  [Column(TypeName = "decimal(18, 2)")]
         [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
         public Decimal? Price { get; set; }
+
+        public string? StockCode { get; set; }
         public string Description { get; set; }
     }
     public class ProductListModel

@@ -8,6 +8,7 @@ builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7020"); // API'nizin base URL'sini buraya yazýn.
     client.DefaultRequestHeaders.Add("Accept", "application/json");
+    //HTTP istemcisi (HttpClient) aracýlýðýyla yapýlan isteðin, sunucuya "Ben JSON formatýnda bir yanýt bekliyorum" þeklinde bilgi vermesi için kullanýlýr. Bu iþlem, HTTP isteðinin Accept baþlýðýný ayarlamayý saðlar.
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

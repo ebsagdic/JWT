@@ -17,6 +17,8 @@ namespace JWT.UI.Controllers
     public class AccountController : Controller
     {
         private readonly HttpClient _httpClient;
+        //Interface'i doğrudan alan olarak saklamanın yerine, somut HttpClient sınıfı saklanıyor.
+        //Birden fazla yerde API çağrısı yapmak istediğinizde, her seferinde CreateClient çağırmanıza gerek kalmaz
 
         public AccountController(IHttpClientFactory httpClientFactory)
         {
@@ -27,7 +29,13 @@ namespace JWT.UI.Controllers
         {
             UserModel userModel = new UserModel();
             ResponseMainModel<UserModel> responseModel = null;
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true // Büyük/küçük harf farkını görmezden gelir
+            };
 
+            //Kodda kullanılan (User.Identity.IsAuthenticated) ifadesi, ASP.NET Core framework'ü tarafından sağlanan bir özelliktir ve kullanıcı kimlik doğrulamasını kontrol etmek için kullanılır.
+            //Bu ifade, ControllerBase sınıfından türeyen kontrolörlerde bulunan User nesnesinin bir özelliğidir.
             if (User.Identity.IsAuthenticated) 
             {
                 var accessToken = User.Claims.FirstOrDefault(x =>x.Type == "access_token")?.Value;
@@ -37,7 +45,7 @@ namespace JWT.UI.Controllers
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
                 }
             }
-            var result = await _httpClient.GetAsync("User/GetUserInfoFromLogined");
+            var result = await _httpClient.GetAsync("api/User/GetUserInfoFromLogined");
 
             if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
@@ -49,10 +57,12 @@ namespace JWT.UI.Controllers
 
             if (result.IsSuccessStatusCode)
             {
-                responseModel = JsonSerializer.Deserialize<ResponseMainModel<UserModel>>(await result.Content.ReadAsStringAsync());
-                userModel = responseModel?.Data ?? new UserModel();
+                var kontrol = await result.Content.ReadAsStringAsync();
+                responseModel = JsonSerializer.Deserialize<ResponseMainModel<UserModel>>(await result.Content.ReadAsStringAsync(), options);
+                userModel = responseModel?.Data ?? new UserModel() { };
+                //?? new UserModel(): Eğer responseModel null ya da Data boş ise, yeni bir UserModel nesnesi oluşturur.
             }
-            return View();
+            return View(userModel);
         }
 
         

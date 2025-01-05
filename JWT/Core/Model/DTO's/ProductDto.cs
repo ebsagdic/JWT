@@ -11,7 +11,8 @@ namespace JWT.Model
         public string Name { get; set; }
         public Decimal? Price { get; set; }
         public string Description { get; set; }
-        public string LastUpdateUser { get; set; }
+        public string?  StockCode { get; set; }
+        public string? LastUpdateUser { get; set; }
 
     }
 }

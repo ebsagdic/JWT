@@ -58,7 +58,8 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            @RenderBody()
+            @RenderBody() @* Layout dosyasında, her sayfanın (örneğin Update.cshtml) kendi içeriğini yerleştireceği ana bölgeyi temsil eder.
+Layout dosyasında zorunludur, çünkü @RenderBody() olmadan bir sayfa içeriği gösterilemez. *@
         </main>
     </div>
 
@@ -70,6 +71,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    @await Html.PartialAsync("_ValidationScriptsPartial") <!-- Tüm sayfalar için --> @* Bir kısmi görünümü (Partial View) çağırır ve içeriğini bulunduğu yere yerleştirir. *@
+    @await RenderSectionAsync("Scripts", required: false) <!-- Sayfa bazlı ek scriptler -->  @* Sayfaların isteğe bağlı veya zorunlu ek içerik tanımlayabileceği bölümleri temsil eder. *@
 </body>
 </html>

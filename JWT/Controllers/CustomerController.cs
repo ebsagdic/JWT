@@ -1,7 +1,6 @@
 ﻿using Business.Abstracts;
 using JWT.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWT.Controllers
@@ -12,16 +11,14 @@ namespace JWT.Controllers
     public class CustomerController : CustomBaseController
     {
         private readonly ICustomerService _customerService;
-        private readonly ILogger<CustomerController> _logger;
 
-        public CustomerController(ICustomerService customerService, ILogger<CustomerController> logger)
+        public CustomerController(ICustomerService customerService)
         {
             this._customerService = customerService;
-            this._logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomers()
+        public async Task<IActionResult> GetAllCustomers()
         {
             var response = await _customerService.GetAllAsync();
 

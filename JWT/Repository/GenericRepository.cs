@@ -49,6 +49,7 @@ namespace Data.Concretes
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
+            
         }
 
         public async Task<TEntity> GetByIdAsync(int id)

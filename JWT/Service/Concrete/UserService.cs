@@ -80,6 +80,8 @@ namespace Business.Services
             }
             UserDto userDto = _mapper.Map<UserDto>(user);
             userDto.SelectedRoles = string.Join(", ", userRoles);
+            userDto.FirstName = user.Name;
+            userDto.LastName = user.Surname;
             return Response<UserDto>.Success(userDto, 200);
         }
     }
