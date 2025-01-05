@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
+
 namespace JWT.UI.Controllers
 {
     public class AccountController : Controller
@@ -143,7 +144,8 @@ namespace JWT.UI.Controllers
                 authProperties);
 
                 return Redirect(loginModel.ReturnUrl ?? "~/");
-                //Kullanıcı oturum açtıktan sonra, geldiği sayfaya (veya varsayılan ana sayfaya) yönlendirilir
+                //Eğer loginModel.ReturnUrl boş(null) veya tanımlanmamışsa, bu durumda ?? operatörü sağ tarafındaki değeri(bu örnekte "~/") kullanır.
+                //"~/"Bu ifade, uygulamanın ana sayfasını(root URL) ifade eder. Eğer uygulamanın ana URL'si https://example.com ise, "~/" bu URL'yi temsil eder.
             }
 
             else

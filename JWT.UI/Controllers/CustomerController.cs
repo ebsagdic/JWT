@@ -87,10 +87,10 @@ namespace JWT.UI.Controllers
                 string strModel = model.ToString();
                 string jsonString = JsonSerializer.Serialize(model);
                 var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+                var result = await _httpClient.PostAsync("api/Customer", content);
+
                 ResponseMainModel<CustomerModel> responseModel = null;
-
-                var result = await _httpClient.PostAsync("Customer", content);
-
                 responseModel = JsonSerializer.Deserialize<ResponseMainModel<CustomerModel>>(await result.Content.ReadAsStringAsync(),options);
 
                 if (result.IsSuccessStatusCode && responseModel != null)

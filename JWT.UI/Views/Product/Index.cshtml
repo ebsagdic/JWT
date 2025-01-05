@@ -34,7 +34,7 @@
                     <td>@p.Name</td>
                     <td>@p.Price</td>
                     <td>@p.Description</td>
-                    <td class="test"><button id="product_update_@p.Id" data-id="@p.Id" type="button" class="btn btn-primary btn-sm product-update">Güncelle</button></td>
+                    <td><a class="btn btn-warning btn-sm" asp-controller="Product" asp-action="Update" asp-route-id="@p.Id">Güncelle</a></td>
                     <td><button id="product_delete_@p.Id" data-id="@p.Id" type="button" class="btn btn-primary btn-sm product-delete">Sil</button></td>
                 </tr>
             }
@@ -46,12 +46,7 @@
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
-                    $(".product-update").click(function (e) {
-                        e.preventDefault();
-                        var productId = $(this).data('id');
-                            document.location = "/Product/Update/" + productId;
-                    });
-
+                    
                     $(".product-delete").click(function (e) {
                         e.preventDefault();
                         var productId = $(this).data('id');
@@ -62,6 +57,9 @@
                                 url: '/Product/Delete',
                                 //contentType: "application/json; charset=utf-8",
                                 data: { id: productId },
+                                //Bu jQuery seçicisi, data-id özelliği productId değerine eşit olan <a> elementini bulur.
+                                //Bulunan <a> elemanına en yakın <tr> (table row, yani tablo satırı) elementini seçer.
+                                //Seçilen <tr> elemanını DOM'dan (sayfa üzerinde) tamamen kaldırır.,
                                 success: function (data) {
                                     $("#product_delete_" + productId).closest('tr').remove();
                                 },
