@@ -98,7 +98,6 @@ namespace JWT.UI.Controllers
             }
             string jsonString = JsonSerializer.Serialize(loginModel);
             var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             var result = await _httpClient.PostAsync("/api/Auth/Login", content);
             var options = new JsonSerializerOptions
             {
@@ -161,12 +160,10 @@ namespace JWT.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-            RegisterModel model = new RegisterModel();
-            model.RoleSelectList = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
-
-            string jsonString = JsonSerializer.Serialize(model);
-            var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            RegisterModel model = new RegisterModel
+            {
+                RoleSelectList = new List<SelectListItem>()
+            };
             var result = await _httpClient.GetAsync("/api/User/roles");
 
             var options = new JsonSerializerOptions
@@ -198,7 +195,8 @@ namespace JWT.UI.Controllers
 
             string jsonString = JsonSerializer.Serialize(registerModel);
             var content = new StringContent(jsonString,Encoding.UTF8, "application/json");
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            //Bu kod Gönderilen verinin formatını belirtir
+            //Ancak program.cs içindeki kod Sunucudan beklenen yanıt formatını belirtir
 
             var result = await _httpClient.PostAsync("/api/User/Register", content);
 
